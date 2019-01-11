@@ -6,3 +6,10 @@ edition = "2018"
 
 [dependencies]
 rand = "0.6.4"
+
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "state_lookup"
+harness = false

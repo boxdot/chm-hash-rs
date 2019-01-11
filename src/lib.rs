@@ -4,7 +4,7 @@ use crate::hash::BytesHash;
 mod graph;
 mod hash;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PerfectHash {
     salt1: Vec<usize>,
     salt2: Vec<usize>,
