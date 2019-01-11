@@ -1,4 +1,5 @@
-use crate::hash::RandomHash;
+use crate::graph::Graph;
+use crate::hash::BytesHash;
 
 mod graph;
 mod hash;
@@ -30,9 +31,8 @@ impl PerfectHash {
     }
 }
 
-pub fn generate_hash<Hash, K, I>(mut keys: I) -> (Vec<usize>, Vec<usize>, Vec<usize>)
+pub fn generate_hash<K, I>(mut keys: I) -> PerfectHash
 where
-    Hash: RandomHash,
     K: AsRef<[u8]>,
     I: ExactSizeIterator<Item = (K, usize)> + Clone,
 {
@@ -42,16 +42,14 @@ where
 
     let mut trial = 0;
     let (mut f1, mut f2, vertex_values) = loop {
-        if trial % TRIALS == 0 {
-            if trial > 0 {
-                n = (n + 1).max((1.05 * n as f64) as usize);
-            }
+        if trial > 0 && trial % TRIALS == 0 {
+            n = (n + 1).max((1.05 * n as f64) as usize);
         }
         trial += 1;
 
-        let mut g = graph::Graph::new(n);
-        let mut f1 = Hash::new(n);
-        let mut f2 = Hash::new(n);
+        let mut g = Graph::new(n);
+        let mut f1 = BytesHash::new(n);
+        let mut f2 = BytesHash::new(n);
 
         for (key, hashval) in keys.clone() {
             g.connect(f1.call(&key) as usize, f2.call(&key) as usize, hashval);
@@ -69,7 +67,7 @@ where
             == hashval)
     );
 
-    (f1.into_salt(), f2.into_salt(), vertex_values)
+    PerfectHash::new(f1.into_salt(), f2.into_salt(), vertex_values)
 }
 
 #[cfg(test)]
@@ -80,13 +78,12 @@ mod tests {
     fn test_generate_hash_for_small_input() {
         let animals = ["Elephant", "Horse", "Camel", "Python", "Dog", "Cat"];
 
-        let (f1, f2, values) = generate_hash::<hash::Hash2, _, _>(
+        let h = generate_hash(
             animals
                 .iter()
                 .enumerate()
                 .map(|(idx, animal)| (animal, idx)),
         );
-        let h = PerfectHash::new(f1, f2, values);
         assert!(animals
             .iter()
             .enumerate()
@@ -102,13 +99,12 @@ mod tests {
             "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
         ];
 
-        let (f1, f2, values) = generate_hash::<hash::Hash2, _, _>(
+        let h = generate_hash(
             us_states
                 .iter()
                 .enumerate()
                 .map(|(idx, state)| (state, idx)),
         );
-        let h = PerfectHash::new(f1, f2, values);
         assert!(us_states
             .iter()
             .enumerate()
