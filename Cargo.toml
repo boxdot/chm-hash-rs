@@ -1,11 +1,17 @@
 [package]
-name = "chm92"
+name = "chm-hash"
 version = "0.1.0"
 authors = ["boxdot <d@zerovolt.org>"]
 edition = "2018"
+license = "MIT/Apache-2.0"
+description = "Perfect hash function generation CHM92 algorithm"
+repository = "https://github.com/boxdot/chm-hash-rs"
+keywords = ["perfect", "hash"]
+categories = ["algorithms"]
+readme = "README.md"
 
 [dependencies]
-rand = "0.6.4"
+rand = "0.6"
 
 [dev-dependencies]
 criterion = "0.2"
